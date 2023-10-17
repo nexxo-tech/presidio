@@ -41,6 +41,10 @@ from presidio_analyzer.predefined_recognizers import (
     ItPassportRecognizer,
     ItIdentityCardRecognizer,
     InPanRecognizer,
+
+    CaSsnRecognizer,
+    CaQcNamRecognizer,
+    CaCpRecognizer,
 )
 
 logger = logging.getLogger("presidio-analyzer")
@@ -72,7 +76,7 @@ class RecognizerRegistry:
         :return: None
         """
         if not languages:
-            languages = ["en"]
+            languages = ["en", "fr"]
 
         nlp_recognizer = self._get_nlp_recognizer(nlp_engine)
         recognizers_map = {
@@ -109,6 +113,11 @@ class RecognizerRegistry:
                 nlp_recognizer,
                 PhoneRecognizer,
                 UrlRecognizer,
+
+                CaQcNamRecognizer,
+                CaQcDlRecognizer,
+                CaCpRecognizer,
+                CaSsnRecognizer,
             ],
         }
         for lang in languages:

@@ -34,6 +34,11 @@ from .it_identity_card_recognizer import ItIdentityCardRecognizer
 from .it_passport_recognizer import ItPassportRecognizer
 from .in_pan_recognizer import InPanRecognizer
 
+from .ca_qc_nam_recognizer import CaQcNamRecognizer
+from .ca_qc_dl_recognizer import CaQcDlRecognizer
+from .ca_pc_recognizer import CaCpRecognizer
+from .ca_ssn_recognizer import CaSsnRecognizer
+
 NLP_RECOGNIZERS = {
     "spacy": SpacyRecognizer,
     "stanza": StanzaRecognizer,
@@ -72,5 +77,10 @@ __all__ = [
     "ItVatCodeRecognizer",
     "ItIdentityCardRecognizer",
     "ItPassportRecognizer",
-    "InPanRecognizer"
+    "InPanRecognizer",
+
+    "CaQcNamRecognizer",
+    "CaQcDlRecognizer",
+    "CaSsnRecognizer",
+    "CaCpRecognizer",
 ]
