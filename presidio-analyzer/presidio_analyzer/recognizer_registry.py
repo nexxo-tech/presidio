@@ -1,7 +1,10 @@
 import copy
 import logging
-from pathlib import Path
 from typing import Optional, List, Iterable, Union, Type, Dict
+
+import regex as re
+
+from pathlib import Path
 from presidio_analyzer.nlp_engine.transformers_nlp_engine import (
     TransformersNlpEngine,
 )
@@ -56,14 +59,21 @@ class RecognizerRegistry:
 
     :param recognizers: An optional list of recognizers,
     that will be available instead of the predefined recognizers
+    :param global_regex_flags : regex flags to be used in regex matching,
+    including deny-lists
+
     """
 
-    def __init__(self, recognizers: Optional[Iterable[EntityRecognizer]] = None):
-
+    def __init__(
+        self,
+        recognizers: Optional[Iterable[EntityRecognizer]] = None,
+        global_regex_flags: Optional[int] = re.DOTALL | re.MULTILINE | re.IGNORECASE,
+    ):
         if recognizers:
             self.recognizers = recognizers
         else:
             self.recognizers = []
+        self.global_regex_flags = global_regex_flags
 
     def load_predefined_recognizers(
         self, languages: Optional[List[str]] = None, nlp_engine: NlpEngine = None
@@ -79,6 +89,7 @@ class RecognizerRegistry:
             languages = ["en", "fr"]
 
         nlp_recognizer = self._get_nlp_recognizer(nlp_engine)
+
         recognizers_map = {
             "en": [
                 UsBankRecognizer,
@@ -110,7 +121,6 @@ class RecognizerRegistry:
                 IbanRecognizer,
                 IpRecognizer,
                 MedicalLicenseRecognizer,
-                nlp_recognizer,
                 PhoneRecognizer,
                 UrlRecognizer,
 
@@ -121,17 +131,33 @@ class RecognizerRegistry:
             ],
         }
         for lang in languages:
-            lang_recognizers = [rc() for rc in recognizers_map.get(lang, [])]
+            lang_recognizers = [
+                self.__instantiate_recognizer(
+                    recognizer_class=rc, supported_language=lang
+                )
+                for rc in recognizers_map.get(lang, [])
+            ]
             self.recognizers.extend(lang_recognizers)
             all_recognizers = [
-                rc(supported_language=lang) for rc in recognizers_map.get("ALL", [])
+                self.__instantiate_recognizer(
+                    recognizer_class=rc, supported_language=lang
+                )
+                for rc in recognizers_map.get("ALL", [])
             ]
             self.recognizers.extend(all_recognizers)
+            if nlp_engine:
+                nlp_recognizer_inst = nlp_recognizer(
+                    supported_language=lang,
+                    supported_entities=nlp_engine.get_supported_entities(),
+                )
+            else:
+                nlp_recognizer_inst = nlp_recognizer(supported_language=lang)
+            self.recognizers.append(nlp_recognizer_inst)
 
     @staticmethod
     def _get_nlp_recognizer(
         nlp_engine: NlpEngine,
-    ) -> Union[Type[SpacyRecognizer], Type[StanzaRecognizer]]:
+    ) -> Type[SpacyRecognizer]:
         """Return the recognizer leveraging the selected NLP Engine."""
 
         if isinstance(nlp_engine, StanzaNlpEngine):
@@ -240,7 +266,7 @@ class RecognizerRegistry:
         )
         self.recognizers = new_recognizers
 
-    def add_pattern_recognizer_from_dict(self, recognizer_dict: Dict):
+    def add_pattern_recognizer_from_dict(self, recognizer_dict: Dict) -> None:
         """
         Load a pattern recognizer from a Dict into the recognizer registry.
 
@@ -255,7 +281,7 @@ class RecognizerRegistry:
         recognizer = PatternRecognizer.from_dict(recognizer_dict)
         self.add_recognizer(recognizer)
 
-    def add_recognizers_from_yaml(self, yml_path: Union[str, Path]):
+    def add_recognizers_from_yaml(self, yml_path: Union[str, Path]) -> None:
         r"""
         Read YAML file and load recognizers into the recognizer registry.
 
@@ -284,3 +310,18 @@ class RecognizerRegistry:
         except TypeError as yaml_error:
             print(f"Failed to parse file {yml_path}")
             raise yaml_error
+
+    def __instantiate_recognizer(
+        self, recognizer_class: Type[EntityRecognizer], supported_language: str
+    ):
+        """
+        Instantiate a recognizer class given type and input.
+
+        :param recognizer_class: Class object of the recognizer
+        :param supported_language: Language this recognizer should support
+        """
+
+        inst = recognizer_class(supported_language=supported_language)
+        if isinstance(inst, PatternRecognizer):
+            inst.global_regex_flags = self.global_regex_flags
+        return inst
