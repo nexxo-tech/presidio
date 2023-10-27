@@ -1,3 +1,4 @@
+import ipaddres
 from collections import defaultdict
 from typing import List, Optional
 
@@ -71,5 +72,11 @@ class CaSsnRecognizer(PatternRecognizer):
         for sample_ssn in ("000", "666", "123456789", "98765432", "078051120"):
             if only_digits.startswith(sample_ssn):
                 return True
+
+        try:
+            ipaddress.ip_address(pattern_text)
+            return True
+        except ValueError:
+            return False
 
         return False
