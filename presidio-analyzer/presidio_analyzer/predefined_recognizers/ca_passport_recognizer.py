@@ -1,12 +1,11 @@
-import ipaddress
-from typing import Optional, List
+from typing import List, Optional
 
 from presidio_analyzer import Pattern, PatternRecognizer
 
 
-class CaPcRecognizer(PatternRecognizer):
+class CaPassportRecognizer(PatternRecognizer):
     """
-    Recognize Canadian Postal Code using regex.
+    Recognizes CA Passport number using regex.
 
     :param patterns: List of patterns to be used by this recognizer
     :param context: List of context words to increase confidence in detection
@@ -14,34 +13,18 @@ class CaPcRecognizer(PatternRecognizer):
     :param supported_entity: The entity this recognizer can detect
     """
 
+    # Weak pattern: all passport numbers are a weak match, e.g., AB123456
     PATTERNS = [
-        Pattern(
-            "Postal Code (Medium)",
-            r"\b([a-zA-Z]\d[a-zA-Z][ -]?\d[a-zA-Z]\d)\b",  # noqa: E501
-            0.5,
-        ),
+        Pattern("Passport (Medium)", r"(\b[a-zA-Z]{2}[0-9]{6}\b)", 0.5),
     ]
-
-    CONTEXT = [
-        "postal code",
-        "zip code",
-        "code postal",
-        "code zip",
-        "cp",
-        "zip",
-        "postal",
-        "code",
-        "adresse",
-        "addresse",
-        "address",
-    ]
+    CONTEXT = ["ca", "canada", "passport", "passeport", "numéro", "passport#", "travel", "voyage", "document", "can"]
 
     def __init__(
         self,
         patterns: Optional[List[Pattern]] = None,
         context: Optional[List[str]] = None,
         supported_language: str = "fr",
-        supported_entity: str = "CA_POSTAL_CODE",
+        supported_entity: str = "CA_PASSPORT",
     ):
         patterns = patterns if patterns else self.PATTERNS
         context = context if context else self.CONTEXT

@@ -45,9 +45,11 @@ from presidio_analyzer.predefined_recognizers import (
     ItIdentityCardRecognizer,
     InPanRecognizer,
 
-    CaSsnRecognizer,
     CaQcNamRecognizer,
-    CaCpRecognizer,
+    CaQcDlRecognizer,
+    CaPcRecognizer,
+    CaSinRecognizer,
+    CaPassportRecognizer,
 )
 
 logger = logging.getLogger("presidio-analyzer")
@@ -126,8 +128,9 @@ class RecognizerRegistry:
 
                 CaQcNamRecognizer,
                 CaQcDlRecognizer,
-                CaCpRecognizer,
-                CaSsnRecognizer,
+                CaPcRecognizer,
+                CaSinRecognizer,
+                CaPassportRecognizer,
             ],
         }
         for lang in languages:

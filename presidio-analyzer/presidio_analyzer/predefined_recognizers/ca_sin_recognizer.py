@@ -5,8 +5,8 @@ from typing import List, Optional
 from presidio_analyzer import Pattern, PatternRecognizer
 
 
-class CaSsnRecognizer(PatternRecognizer):
-    """Recognize CA Social Security Number (SSN) using regex.
+class CaSinRecognizer(PatternRecognizer):
+    """Recognize CA Social Insurance Number (SIN) using regex.
 
     :param patterns: List of patterns to be used by this recognizer
     :param context: List of context words to increase confidence in detection
@@ -15,8 +15,8 @@ class CaSsnRecognizer(PatternRecognizer):
     """
 
     PATTERNS = [
-        Pattern("SSN1 (weak)", r"\b[0-9]{9}\b", 0.2),
-        Pattern("SSN2 (medium)", r"\b([0-9]{3})[- .]([0-9]{3})[- .]([0-9]{3})\b", 0.5),
+        Pattern("SIN1 (weak)", r"\b[0-9]{9}\b", 0.2),
+        Pattern("SIN2 (medium)", r"\b([0-9]{3})[- .]([0-9]{3})[- .]([0-9]{3})\b", 0.5),
     ]
 
     CONTEXT = [
@@ -26,6 +26,10 @@ class CaSsnRecognizer(PatternRecognizer):
         "#nas",
         "ssn",
         "sin",
+        "numéro",
+        "number",
+        "#sin",
+        "#",
     ]
 
     def __init__(
@@ -33,7 +37,7 @@ class CaSsnRecognizer(PatternRecognizer):
         patterns: Optional[List[Pattern]] = None,
         context: Optional[List[str]] = None,
         supported_language: str = "fr",
-        supported_entity: str = "CA_SSN",
+        supported_entity: str = "CA_SIN",
     ):
         patterns = patterns if patterns else self.PATTERNS
         context = context if context else self.CONTEXT
@@ -46,7 +50,7 @@ class CaSsnRecognizer(PatternRecognizer):
 
     def invalidate_result(self, pattern_text: str) -> bool:
         """
-        Check if the pattern text cannot be validated as a CA_SSN entity.
+        Check if the pattern text cannot be validated as a CA_SIN entity.
 
         :param pattern_text: Text detected as pattern by regex
         :return: True if invalidated
