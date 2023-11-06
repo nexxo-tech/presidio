@@ -1,4 +1,5 @@
-import ipaddres
+import ipaddress
+
 from collections import defaultdict
 from typing import List, Optional
 
@@ -16,7 +17,7 @@ class CaSinRecognizer(PatternRecognizer):
 
     PATTERNS = [
         Pattern("SIN1 (weak)", r"\b[0-9]{9}\b", 0.2),
-        Pattern("SIN2 (medium)", r"\b([0-9]{3})[- .]([0-9]{3})[- .]([0-9]{3})\b", 0.5),
+        Pattern("SIN2 (medium)", r"\b([0-9]{3})[- .]([0-9]{3})[- .]([0-9]{3})[- .]?([0-9]{0,3})$\b", 0.5),
     ]
 
     CONTEXT = [
@@ -76,6 +77,9 @@ class CaSinRecognizer(PatternRecognizer):
         for sample_ssn in ("000", "666", "123456789", "98765432", "078051120"):
             if only_digits.startswith(sample_ssn):
                 return True
+        
+        if  len(only_digits) != 9:
+            return True
 
         try:
             ipaddress.ip_address(pattern_text)
