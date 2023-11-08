@@ -65,3 +65,24 @@ class CaQcNamRecognizer(PatternRecognizer):
             context=context,
             supported_language=supported_language,
         )
+
+    def invalidate_result(self, pattern_text: str) -> bool:
+        """
+        Check if the pattern text cannot be validated as a CA_QC_NAM entity.
+
+        :param pattern_text: Text detected as pattern by regex
+        :return: True if invalidated
+        """
+        # if there are delimiters, make sure both delimiters are the same
+        clean_string = pattern_text.replace(" ", "").replace("-", "")
+        if len(clean_string) != 12:
+            return True
+
+        # Months are augmented of 50 for women
+        if not int(clean_string[6:8]) in range(1, 13) and not int(clean_string[6:8]) in range(51, 63):
+            return True
+
+        if not int(clean_string[8:10]) in range(1, 32):
+            return True
+
+        return False

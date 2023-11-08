@@ -60,26 +60,11 @@ class CaSinRecognizer(PatternRecognizer):
             supported_language=supported_language,
         )
     
-    def validate_result(self, pattern_text: str) -> bool:
-        """
-        Validate the pattern logic e.g., by running checksum on a detected pattern using https://en.wikipedia.org/wiki/Luhn_algorithm.
+    def validate_result(self, pattern_text: str) -> bool:  # noqa D102
+        sanitized_value = self.__sanitize_value(pattern_text, self.replacement_pairs)
+        checksum = self.__luhn_checksum(sanitized_value)
 
-        :param pattern_text: the text to validated.
-        Only the part in text that was detected by the regex engine
-        :return: A bool indicating whether the validation was successful.
-        """
-        # Pre-processing before validation checks
-        text = self.__sanitize_value(pattern_text, self.replacement_pairs)
-        sin_list = [int(digit) for digit in text if not digit.isspace()]
-
-        # Set weights based on digit position
-        weight = [1, 2, 1, 2, 1, 2, 1, 2, 1]
-
-        # Perform checksums
-        sum_product = 0
-        for i in range(8):
-            sum_product += (sin_list[i + 1] // 10 + sin_list[i + 1] % 10) * weight[i]
-        return sum_product % 10 == 0
+        return checksum
 
     def invalidate_result(self, pattern_text: str) -> bool:
         """
@@ -97,11 +82,12 @@ class CaSinRecognizer(PatternRecognizer):
             # mismatched delimiters
             return True
 
+        only_digits = "".join(c for c in pattern_text if c.isdigit())
         if only_digits[0] == "8":
             # cannot start with 8 : https://www.canada.ca/en/employment-social-development/services/sin.html
             return True
 
-        if only_digits[0:2] == "000" or only_digits[3:5] == "000" or only_digits[6:8] == "000":
+        if only_digits[0:3] == "000" or only_digits[3:6] == "000" or only_digits[6:] == "000":
             # groups cannot be all zeros
             return True
         
@@ -115,6 +101,19 @@ class CaSinRecognizer(PatternRecognizer):
             return False
 
         return False
+
+    @staticmethod
+    def __luhn_checksum(sanitized_value: str) -> bool:
+        def digits_of(n: str) -> List[int]:
+            return [int(dig) for dig in str(n)]
+
+        digits = digits_of(sanitized_value)
+        odd_digits = digits[-1::-2]
+        even_digits = digits[-2::-2]
+        checksum = sum(odd_digits)
+        for d in even_digits:
+            checksum += sum(digits_of(str(d * 2)))
+        return checksum % 10 == 0
 
     @staticmethod
     def __sanitize_value(text: str, replacement_pairs: List[Tuple[str, str]]) -> str:
