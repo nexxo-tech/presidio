@@ -39,6 +39,7 @@ from .ca_qc_dl_recognizer import CaQcDlRecognizer
 from .ca_pc_recognizer import CaPcRecognizer
 from .ca_sin_recognizer import CaSinRecognizer
 from .ca_passport_recognizer import CaPassportRecognizer
+from .ca_bank_recognizer import CaBankRecognizer
 
 NLP_RECOGNIZERS = {
     "spacy": SpacyRecognizer,
@@ -86,4 +87,5 @@ __all__ = [
     "CaPcRecognizer",
     "CaCpRecognizer",
     "CaPassportRecognizer",
+    "CaBankRecognizer",
 ]

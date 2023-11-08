@@ -50,6 +50,7 @@ from presidio_analyzer.predefined_recognizers import (
     CaPcRecognizer,
     CaSinRecognizer,
     CaPassportRecognizer,
+    CaBankRecognizer,
 )
 
 logger = logging.getLogger("presidio-analyzer")
@@ -131,6 +132,7 @@ class RecognizerRegistry:
                 CaPcRecognizer,
                 CaSinRecognizer,
                 CaPassportRecognizer,
+                CaBankRecognizer,
             ],
         }
         for lang in languages:
