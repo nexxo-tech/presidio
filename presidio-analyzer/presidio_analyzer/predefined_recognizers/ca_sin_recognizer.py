@@ -1,18 +1,19 @@
 import ipaddress
 
 from collections import defaultdict
-from typing import List, Optional
+from typing import Optional, List, Tuple
 
 from presidio_analyzer import Pattern, PatternRecognizer
 
 
 class CaSinRecognizer(PatternRecognizer):
-    """Recognize CA Social Insurance Number (SIN) using regex.
+    """Recognize CA Social Insurance Number (SIN) using regex. Inspired from https://learn.microsoft.com/en-us/purview/sit-defn-canada-social-insurance-number
 
     :param patterns: List of patterns to be used by this recognizer
     :param context: List of context words to increase confidence in detection
     :param supported_language: Language this recognizer supports
     :param supported_entity: The entity this recognizer can detect
+    :param replacement_pairs: List of tuples with potential replacement values
     """
 
     PATTERNS = [
@@ -22,13 +23,19 @@ class CaSinRecognizer(PatternRecognizer):
 
     CONTEXT = [
         "nas",
+        "NAS",
         "assurance",
+        "numero d'assurance sociale",
+        "carte d’assurance sociale",
+        "assurance social",
+        "assurance sociale",
+        "numéro d’assurance social",
+        "numéro d’assurance sociale",
         "sociale",
         "#nas",
         "ssn",
         "sin",
-        "numéro",
-        "number",
+        "ssns",
         "#sin",
         "#",
     ]
@@ -39,7 +46,11 @@ class CaSinRecognizer(PatternRecognizer):
         context: Optional[List[str]] = None,
         supported_language: str = "fr",
         supported_entity: str = "CA_SIN",
+        replacement_pairs: Optional[List[Tuple[str, str]]] = None,
     ):
+        self.replacement_pairs = (
+            replacement_pairs if replacement_pairs else [("-", ""), (" ", ""), (".", "")]
+        )
         patterns = patterns if patterns else self.PATTERNS
         context = context if context else self.CONTEXT
         super().__init__(
@@ -48,6 +59,27 @@ class CaSinRecognizer(PatternRecognizer):
             context=context,
             supported_language=supported_language,
         )
+    
+    def validate_result(self, pattern_text: str) -> bool:
+        """
+        Validate the pattern logic e.g., by running checksum on a detected pattern using https://en.wikipedia.org/wiki/Luhn_algorithm.
+
+        :param pattern_text: the text to validated.
+        Only the part in text that was detected by the regex engine
+        :return: A bool indicating whether the validation was successful.
+        """
+        # Pre-processing before validation checks
+        text = self.__sanitize_value(pattern_text, self.replacement_pairs)
+        sin_list = [int(digit) for digit in text if not digit.isspace()]
+
+        # Set weights based on digit position
+        weight = [1, 2, 1, 2, 1, 2, 1, 2, 1]
+
+        # Perform checksums
+        sum_product = 0
+        for i in range(8):
+            sum_product += (sin_list[i + 1] // 10 + sin_list[i + 1] % 10) * weight[i]
+        return sum_product % 10 == 0
 
     def invalidate_result(self, pattern_text: str) -> bool:
         """
@@ -65,20 +97,15 @@ class CaSinRecognizer(PatternRecognizer):
             # mismatched delimiters
             return True
 
-        only_digits = "".join(c for c in pattern_text if c.isdigit())
-        if all(only_digits[0] == c for c in only_digits):
-            # cannot be all same digit
+        if only_digits[0] == "8":
+            # cannot start with 8 : https://www.canada.ca/en/employment-social-development/services/sin.html
             return True
 
-        if only_digits[3:5] == "00" or only_digits[5:] == "0000":
+        if only_digits[0:2] == "000" or only_digits[3:5] == "000" or only_digits[6:8] == "000":
             # groups cannot be all zeros
             return True
-
-        for sample_ssn in ("000", "666", "123456789", "98765432", "078051120"):
-            if only_digits.startswith(sample_ssn):
-                return True
         
-        if  len(only_digits) != 9:
+        if len(only_digits) != 9:
             return True
 
         try:
@@ -88,3 +115,9 @@ class CaSinRecognizer(PatternRecognizer):
             return False
 
         return False
+
+    @staticmethod
+    def __sanitize_value(text: str, replacement_pairs: List[Tuple[str, str]]) -> str:
+        for search_string, replacement_string in replacement_pairs:
+            text = text.replace(search_string, replacement_string)
+        return text
