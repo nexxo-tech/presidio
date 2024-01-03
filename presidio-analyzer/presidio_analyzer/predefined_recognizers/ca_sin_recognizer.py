@@ -24,20 +24,20 @@ class CaSinRecognizer(PatternRecognizer):
     CONTEXT = [
         "nas",
         "NAS",
-        "assurance",
         "numero d'assurance sociale",
+        "numéro d'assurance sociale",
+        "numéro d'assurance social",
+        "numero d’assurance sociale",
+        "numéro d’assurance social",
+        "numéro d’assurance sociale",
         "carte d’assurance sociale",
         "assurance social",
         "assurance sociale",
-        "numéro d’assurance social",
-        "numéro d’assurance sociale",
-        "sociale",
         "#nas",
         "ssn",
         "sin",
         "ssns",
         "#sin",
-        "#",
     ]
 
     def __init__(

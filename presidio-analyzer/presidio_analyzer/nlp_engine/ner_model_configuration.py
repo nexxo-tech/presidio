@@ -26,8 +26,22 @@ MODEL_TO_PRESIDIO_ENTITY_MAPPING = dict(
     HOSPITAL="ORGANIZATION",
 )
 
-LOW_SCORE_ENTITY_NAMES = {"ORG", "ORGANIZATION"}
-LABELS_TO_IGNORE = {"O"}
+LOW_SCORE_ENTITY_NAMES = set()
+LABELS_TO_IGNORE = {
+    "O",
+    "ORG",
+    "ORGANIZATION",
+    "CARDINAL",
+    "EVENT",
+    "LANGUAGE",
+    "LAW",
+    "MONEY",
+    "ORDINAL",
+    "PERCENT",
+    "PRODUCT",
+    "QUANTITY",
+    "WORK_OF_ART",
+}
 
 
 @dataclass
@@ -80,12 +94,12 @@ class NerModelConfiguration:
     @classmethod
     def _validate_input(cls, ner_model_configuration_dict: Dict) -> None:
         key_to_type = {
-            "labels_to_ignore": list,
+            "labels_to_ignore": Collection,
             "aggregation_strategy": str,
             "alignment_mode": str,
             "model_to_presidio_entity_mapping": dict,
             "low_confidence_score_multiplier": float,
-            "low_score_entity_names": list,
+            "low_score_entity_names": Collection,
             "stride": int,
         }
 

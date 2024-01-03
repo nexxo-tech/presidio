@@ -33,6 +33,7 @@ from .au_acn_recognizer import AuAcnRecognizer
 from .au_tfn_recognizer import AuTfnRecognizer
 from .au_medicare_recognizer import AuMedicareRecognizer
 from .in_pan_recognizer import InPanRecognizer
+from .pl_pesel_recognizer import PlPeselRecognizer
 
 from .ca_qc_nam_recognizer import CaQcNamRecognizer
 from .ca_qc_dl_recognizer import CaQcDlRecognizer
@@ -80,7 +81,9 @@ __all__ = [
     "ItIdentityCardRecognizer",
     "ItPassportRecognizer",
     "InPanRecognizer",
+    "PlPeselRecognizer",
 
+    # Sortify
     "CaQcNamRecognizer",
     "CaQcDlRecognizer",
     "CaSinRecognizer",

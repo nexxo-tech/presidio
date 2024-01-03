@@ -65,6 +65,29 @@ class CreditCardRecognizer(PatternRecognizer):
 
         return checksum
 
+    def invalidate_result(self, pattern_text: str) -> bool:
+        """
+        Check if the pattern text cannot be validated as a CA_SIN entity.
+
+        :param pattern_text: Text detected as pattern by regex
+        :return: True if invalidated
+        """
+        # if there are delimiters, make sure both delimiters are the same
+        delimiter_counts = defaultdict(int)
+        for c in pattern_text:
+            if c in ("-", " "):
+                delimiter_counts[c] += 1
+        if len(delimiter_counts.keys()) > 1:
+            # mismatched delimiters
+            return True
+
+        sanitized_value = self.__sanitize_value(pattern_text, self.replacement_pairs)
+        if len(sanitized_value) == (pattern_text) - 1:
+            # cannot have only one delimiter
+            return True
+
+        return False
+
     @staticmethod
     def __luhn_checksum(sanitized_value: str) -> bool:
         def digits_of(n: str) -> List[int]:
