@@ -34,6 +34,7 @@ from .au_tfn_recognizer import AuTfnRecognizer
 from .au_medicare_recognizer import AuMedicareRecognizer
 from .in_pan_recognizer import InPanRecognizer
 from .pl_pesel_recognizer import PlPeselRecognizer
+from .azure_ai_language import AzureAILanguageRecognizer
 
 from .ca_qc_nam_recognizer import CaQcNamRecognizer
 from .ca_qc_dl_recognizer import CaQcDlRecognizer
@@ -82,6 +83,7 @@ __all__ = [
     "ItPassportRecognizer",
     "InPanRecognizer",
     "PlPeselRecognizer",
+    "AzureAILanguageRecognizer",
 
     # Sortify
     "CaQcNamRecognizer",
