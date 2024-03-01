@@ -45,6 +45,8 @@ from presidio_analyzer.predefined_recognizers import (
     ItIdentityCardRecognizer,
     InPanRecognizer,
     PlPeselRecognizer,
+    InAadhaarRecognizer,
+    InVehicleRegistrationRecognizer,
 
     # Sortify
     CaQcNamRecognizer,
@@ -109,6 +111,8 @@ class RecognizerRegistry:
                 AuTfnRecognizer,
                 AuMedicareRecognizer,
                 InPanRecognizer,
+                InAadhaarRecognizer,
+                InVehicleRegistrationRecognizer,
             ],
             "es": [EsNifRecognizer],
             "it": [
