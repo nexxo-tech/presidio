@@ -64,15 +64,20 @@ with at least one NLP engine (`spaCy`, `transformers` or `stanza`):
 
 ### PII redaction in images
 
-For PII redaction in images, install the `presidio-image-redactor` package:
+For PII redaction in images
 
-```sh
-pip install presidio_image_redactor
+1. Install the `presidio-image-redactor` package:
 
-# Presidio image redactor uses the presidio-analyzer
-# which requires a spaCy language model:
-python -m spacy download en_core_web_lg
-```
+    ```sh
+    pip install presidio_image_redactor
+    
+    # Presidio image redactor uses the presidio-analyzer
+    # which requires a spaCy language model:
+    python -m spacy download en_core_web_lg
+    ```
+
+2. Install an OCR engine. The default version uses the [Tesseract OCR Engine](https://github.com/tesseract-ocr/tesseract). 
+More information on installation can be found [here](image-redactor/index.md#installation).
 
 ## Using Docker
 
@@ -80,7 +85,8 @@ Presidio can expose REST endpoints for each service using Flask and Docker.
 To download the Presidio Docker containers, run the following command:
 
 !!! note "Note"
- This requires Docker to be installed. [Download Docker](https://docs.docker.com/get-docker/).
+
+    This requires Docker to be installed. [Download Docker](https://docs.docker.com/get-docker/).
 
 ### For PII anonymization in text
 
@@ -93,9 +99,9 @@ docker pull mcr.microsoft.com/presidio-analyzer
 docker pull mcr.microsoft.com/presidio-anonymizer
 
 # Run containers with default ports
-docker run -d -p 5001:3000 mcr.microsoft.com/presidio-analyzer:latest
+docker run -d -p 5002:3000 mcr.microsoft.com/presidio-analyzer:latest
 
-docker run -d -p 5002:3000 mcr.microsoft.com/presidio-anonymizer:latest
+docker run -d -p 5001:3000 mcr.microsoft.com/presidio-anonymizer:latest
 ```
 
 ### For PII redaction in images

@@ -57,8 +57,8 @@ def test_when_get_recognizers_then_all_recognizers_returned(mock_recognizer_regi
     registry = mock_recognizer_registry
     registry.load_predefined_recognizers()
     recognizers = registry.get_recognizers(language="en", all_fields=True)
-    # 1 custom recognizer in english + 24 predefined
-    assert len(recognizers) == 1 + 24
+    # 1 custom recognizer in english + 26 predefined
+    assert len(recognizers) == 1 + 26
 
 
 def test_when_get_recognizers_then_return_all_fields(mock_recognizer_registry):
@@ -232,3 +232,20 @@ def test_recognizer_removed_and_returned_entities_are_correct():
     analyzer = AnalyzerEngine(registry=registry, supported_languages="en")
 
     analyzer.analyze("My name is David", language="en")
+
+
+def test_remove_recognizer_when_multiple_instances_exist():
+    registry = RecognizerRegistry()
+
+    spacy_english = SpacyRecognizer(supported_language="en")
+    spacy_spanish = SpacyRecognizer(supported_language="es")
+    registry.add_recognizer(spacy_english)
+    registry.add_recognizer(spacy_spanish)
+
+    registry.remove_recognizer("SpacyRecognizer", language="en")
+    assert len(registry.recognizers) == 1
+
+    assert registry.recognizers[0].supported_language == "es"
+    assert len([rec for rec in registry.recognizers
+                if rec.name == "SpacyRecognizer"]) == 1
+

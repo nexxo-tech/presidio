@@ -1,15 +1,15 @@
 import datetime
 import logging
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 
 import regex as re
 
 from presidio_analyzer import (
+    AnalysisExplanation,
+    EntityRecognizer,
     LocalRecognizer,
     Pattern,
     RecognizerResult,
-    EntityRecognizer,
-    AnalysisExplanation,
 )
 from presidio_analyzer.nlp_engine import NlpArtifacts
 
@@ -182,7 +182,13 @@ class PatternRecognizer(LocalRecognizer):
         results = []
         for pattern in self.patterns:
             match_start_time = datetime.datetime.now()
-            matches = re.finditer(pattern.regex, text, flags=flags)
+
+            # Compile regex if flags differ from flags the regex was compiled with
+            if not pattern.compiled_regex or pattern.compiled_with_flags != flags:
+                pattern.compiled_with_flags = flags
+                pattern.compiled_regex = re.compile(pattern.regex, flags=flags)
+
+            matches = pattern.compiled_regex.finditer(text)
             match_time = datetime.datetime.now() - match_start_time
             logger.debug(
                 "--- match_time[%s]: %s.%s seconds",

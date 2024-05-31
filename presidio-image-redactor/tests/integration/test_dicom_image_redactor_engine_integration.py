@@ -4,6 +4,7 @@ Note that we are not asserting every pixel is equal when comparing original to r
 images to account for differences in performance with different versions of
 OCR.
 """
+
 import tempfile
 import pydicom
 from pathlib import Path
@@ -47,8 +48,7 @@ def mock_di_engine():
 
 def all_engines_required():
     """Return all required engines and their must_pass flag for tests."""
-    return [(must_succeed(mock_tesseract_engine)),
-            (allow_failure(mock_di_engine))]
+    return [(must_succeed(mock_tesseract_engine)), (allow_failure(mock_di_engine))]
 
 
 @pytest.mark.parametrize(
@@ -70,9 +70,18 @@ def test_redact_image_correctly(engine_builder: Callable, dcm_filepath: Path):
     test_image = pydicom.dcmread(dcm_filepath)
     test_redacted_image = engine_builder().redact(test_image, use_metadata=True)
 
-    assert (
-        np.array_equal(test_image.pixel_array, test_redacted_image.pixel_array) is False
-    )
+    assert np.array_equal(test_image.pixel_array, test_redacted_image.pixel_array) is False
+
+
+def test_compare_original_to_redacted():
+    """Test the redact_and_return_bbox function."""
+    input_path = Path(RESOURCES_PARENT_DIR, "0_ORIGINAL.dcm")
+    input_image = pydicom.dcmread(input_path)
+    redacted_path = Path(RESOURCES_PARENT_DIR, "0_ORIGINAL_redacted.dcm")
+    expected_redacted = pydicom.dcmread(redacted_path)
+    engine = DicomImageRedactorEngine()
+    actual_redacted, bboxes = engine.redact_and_return_bbox(image=input_image, use_metadata=True)
+    assert np.array_equal(expected_redacted.pixel_array, actual_redacted.pixel_array)
 
 
 @pytest.mark.parametrize("engine_builder", all_engines_required())
@@ -86,10 +95,7 @@ def test_redact_from_single_file_correctly(engine_builder: Callable):
         # Set file paths and redact PII
         input_path = Path(RESOURCES_PARENT_DIR, "0_ORIGINAL.dcm")
         engine_builder().redact_from_file(
-            input_dicom_path=str(input_path),
-            output_dir=tmpdirname,
-            fill="contrast",
-            use_metadata=True
+            input_dicom_path=str(input_path), output_dir=tmpdirname, fill="contrast", use_metadata=True
         )
         output_path = Path(tmpdirname, f"{input_path.stem}.dcm")
 
@@ -113,9 +119,7 @@ def test_redact_from_single_file_correctly(engine_builder: Callable):
         if element_original == element_redacted:
             same_elements.append(tag)
 
-    assert len(instance_original) - 1 == len(
-        same_elements
-    )  # only PixelData should be different
+    assert len(instance_original) - 1 == len(same_elements)  # only PixelData should be different
     assert original_pixels != redacted_pixels
 
 
@@ -129,10 +133,7 @@ def test_redact_from_directory_correctly(mock_engine: DicomImageRedactorEngine):
         # Set file paths and redact PII
         input_path = Path(RESOURCES_DIR1)
         mock_engine.redact_from_directory(
-            input_dicom_path=str(input_path),
-            output_dir=tmpdirname,
-            fill="contrast",
-            use_metadata=True
+            input_dicom_path=str(input_path), output_dir=tmpdirname, fill="contrast", use_metadata=True
         )
 
         # Get list of all DICOM files

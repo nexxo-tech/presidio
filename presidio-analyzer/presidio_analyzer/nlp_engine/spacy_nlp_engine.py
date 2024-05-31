@@ -1,13 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Optional, Dict, Iterator, Tuple, Union, List
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 import spacy
-
 from spacy.language import Language
 from spacy.tokens import Doc, Span
 
-from presidio_analyzer.nlp_engine import NlpArtifacts, NlpEngine, NerModelConfiguration
+from presidio_analyzer.nlp_engine import NerModelConfiguration, NlpArtifacts, NlpEngine
 
 logger = logging.getLogger("presidio-analyzer")
 
@@ -83,6 +82,12 @@ class SpacyNlpEngine(NlpEngine):
         return list(
             set(self.ner_model_configuration.model_to_presidio_entity_mapping.values())
         )
+
+    def get_supported_languages(self) -> List[str]:
+        """Return the supported languages for this NLP engine."""
+        if not self.nlp:
+            raise ValueError("NLP engine is not loaded. Consider calling .load()")
+        return list(self.nlp.keys())
 
     def is_loaded(self) -> bool:
         """Return True if the model is already loaded."""
