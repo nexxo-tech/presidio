@@ -1,5 +1,6 @@
 supported_languages: 
   - en
+  - fr
 
 recognizers:
   # Recognizers listed here can either be loaded from the recognizers defined in code (type: predefined),
@@ -20,6 +21,7 @@ recognizers:
       context: [tarjeta, credito, visa, mastercard, cc, amex, discover, jcb, diners, maestro, instapayment]
     - language: it
     - language: pl
+    - language: fr
     type: predefined
 
   - name: UsBankRecognizer
@@ -125,6 +127,41 @@ recognizers:
   - name: PlPeselRecognizer
     supported_languages: 
     - pl
+    type: predefined
+
+  - name: CaQcNamRecognizer
+    supported_languages: 
+    - fr
+    type: predefined
+    
+  - name: PlPeselRecognizer
+    supported_languages: 
+    - pl
+    type: predefined
+    
+  - name: CaQcDlRecognizer
+    supported_languages: 
+    - fr
+    type: predefined
+    
+  - name: CaPcRecognizer
+    supported_languages: 
+    - fr
+    type: predefined
+    
+  - name: CaSinRecognizer
+    supported_languages: 
+    - fr
+    type: predefined
+    
+  - name: CaPassportRecognizer
+    supported_languages: 
+    - fr
+    type: predefined
+
+  - name: CaBankRecognizer
+    supported_languages: 
+    - fr
     type: predefined
 
 

@@ -106,7 +106,7 @@ __all__ = [
     "AzureAILanguageRecognizer",
     "InAadhaarRecognizer",
     "InVehicleRegistrationRecognizer",
-        "SgUenRecognizer",
+    "SgUenRecognizer",
     "InVoterRecognizer",
     "InPassportRecognizer",
     "FiPersonalIdentityCodeRecognizer",
