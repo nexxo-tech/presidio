@@ -168,39 +168,44 @@ recognizers:
   - name: InVoterRecognizer
     type: predefined
 
-# Sortify Recognizers
-
- - name: CaQcNamRecognizer
-    supported_languages: 
-    - fr
-    type: predefined
-    
   - name: PlPeselRecognizer
     supported_languages: 
     - pl
     type: predefined
-    
+
+  # Sortify Recognizers
+  - name: CaQcNamRecognizer
+    supported_languages: 
+    - fr
+    - en
+    type: predefined
+
   - name: CaQcDlRecognizer
     supported_languages: 
     - fr
+    - en
     type: predefined
-    
+
   - name: CaPcRecognizer
     supported_languages: 
     - fr
+    - en
     type: predefined
-    
+
   - name: CaSinRecognizer
     supported_languages: 
     - fr
+    - en
     type: predefined
-    
+
   - name: CaPassportRecognizer
     supported_languages: 
     - fr
+    - en
     type: predefined
 
   - name: CaBankRecognizer
     supported_languages: 
     - fr
+    - en
     type: predefined

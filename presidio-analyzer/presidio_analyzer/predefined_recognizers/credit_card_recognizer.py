@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import List, Optional, Tuple
 
 from presidio_analyzer import Pattern, PatternRecognizer
